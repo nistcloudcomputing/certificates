@@ -69,3 +69,4 @@ Example record:
 - API does not reveal whether email exists when credentials are invalid
 
 # certificates
+# certificates
