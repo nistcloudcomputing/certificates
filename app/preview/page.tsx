@@ -103,7 +103,7 @@ export default function PreviewPage() {
   }, [token]);
 
   return (
-    <div className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-zinc-950 px-4 py-6">
+    <div className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-zinc-950 px-3 py-5 sm:px-4 sm:py-6">
       <div className="absolute inset-0 bg-gradient-to-b from-black/72 via-black/80 to-black/94" />
       <div className="absolute inset-x-0 top-0 h-[36vh] bg-gradient-to-b from-black/95 via-black/80 to-transparent" />
       <main className="relative z-10 w-full max-w-5xl">
@@ -111,7 +111,7 @@ export default function PreviewPage() {
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h1 className="text-xl font-semibold text-zinc-100 md:text-2xl">Certificate Preview</h1>
-              <p className="text-sm text-zinc-300">{name} • {email}</p>
+              <p className="break-all text-sm text-zinc-200">{name} • {email}</p>
             </div>
             {downloadUrl ? (
               <div className="w-full sm:w-52">
@@ -130,7 +130,7 @@ export default function PreviewPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.25 }}
-              className="h-[72vh] overflow-hidden rounded-2xl border border-white/15 bg-black/35"
+              className="h-[56vh] overflow-hidden rounded-2xl border border-white/20 bg-white/6 sm:h-[64vh] lg:h-[72vh]"
             >
               {isImagePreview ? (
                 <div className="relative h-full w-full">
@@ -161,7 +161,7 @@ export default function PreviewPage() {
                   animate={{ scale: 1, y: 0, opacity: 1 }}
                   exit={{ scale: 0.98, y: 6, opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="w-full max-w-md rounded-2xl border border-white/15 bg-zinc-900 p-6 text-center shadow-2xl"
+                  className="w-full max-w-md rounded-2xl border border-white/30 bg-white/18 p-5 text-center shadow-2xl backdrop-blur-xl sm:p-6"
                 >
                   <p className="text-lg font-semibold text-zinc-100">
                     {`Thank you for making ${EVENT_NAME} successful.`}

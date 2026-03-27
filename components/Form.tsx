@@ -94,7 +94,7 @@ export default function Form() {
   return (
     <motion.form
       className={`space-y-4 transition ${
-        message?.type === "error" ? "rounded-2xl shadow-[0_0_42px_rgba(239,68,68,0.24)]" : ""
+        message?.type === "error" ? "rounded-2xl shadow-[0_0_42px_rgba(248,113,113,0.2)]" : ""
       }`}
       onSubmit={handleSubmit}
       animate={formControls}
@@ -149,11 +149,11 @@ export default function Form() {
             transition={{ duration: 0.2, ease: "easeOut" }}
             className={`rounded-xl border px-3 py-2 text-sm ${
               message.type === "success"
-                ? "border-zinc-300/30 bg-zinc-800/45 text-zinc-100"
-                : "border-red-400/35 bg-red-500/14 text-red-100"
+                ? "border-white/35 bg-white/16 text-zinc-100"
+                : "border-red-300/45 bg-red-200/18 text-red-50"
             }`}
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 break-words">
               {message.type === "success" ? (
                 <motion.span
                   initial={{ opacity: 0, scale: 0.5 }}

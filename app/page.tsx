@@ -87,7 +87,7 @@ export default function Home() {
     : "linear-gradient(180deg, #060606 0%, #030303 48%, #000000 100%)";
 
   return (
-    <div className="relative isolate flex min-h-screen items-center justify-center overflow-hidden px-4 py-8 sm:px-6 sm:py-10">
+    <div className="relative isolate flex min-h-screen items-center justify-center overflow-hidden px-4 py-20 sm:px-6 sm:py-12">
       {backgroundImages.length > 0 ? (
         <BackgroundSlideshow images={backgroundImages} />
       ) : (
@@ -108,10 +108,10 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Visit Cloud Computing Club website"
-          className="absolute left-1/2 top-4 z-20 -translate-x-1/2 transition-opacity hover:opacity-90 sm:top-6"
+          className="absolute left-1/2 top-3 z-20 w-[calc(100%-1.5rem)] max-w-max -translate-x-1/2 transform-gpu transition-all hover:-translate-y-0.5 hover:opacity-90 active:translate-y-0 sm:top-6"
         >
-          <div className="flex items-center gap-2.5 sm:gap-3">
-            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-zinc-100 sm:text-base">
+          <div className="mx-auto flex w-fit max-w-full items-center gap-2 rounded-full border border-white/20 bg-black/28 px-3 py-1.5 backdrop-blur-sm sm:gap-3 sm:px-4 sm:py-2">
+            <p className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-100 sm:text-base">
               Cloud Computing Club
             </p>
             <div className="relative h-10 w-10 sm:h-12 sm:w-12">
@@ -128,15 +128,15 @@ export default function Home() {
         </a>
       ) : null}
 
-      <main className="relative z-10 w-full max-w-md md:max-w-lg">
+      <main className="relative z-10 w-full max-w-md pb-16 pt-12 sm:max-w-lg sm:pb-20 sm:pt-16">
         <Card className="mx-auto">
           <p className="mb-2 text-center text-xs font-medium uppercase tracking-[0.24em] text-zinc-300/85">
             {eventName}
           </p>
-          <h1 className="bg-gradient-to-r from-zinc-100 via-zinc-200 to-zinc-300 bg-clip-text text-center text-2xl font-semibold tracking-tight text-transparent md:text-4xl">
-            Download your certifiate
+          <h1 className="bg-gradient-to-r from-zinc-50 via-zinc-100 to-zinc-200 bg-clip-text text-center text-[clamp(1.55rem,6.3vw,2.25rem)] font-semibold tracking-tight text-transparent">
+            Download your certificate
           </h1>
-          <p className="mt-3 text-center text-sm leading-6 text-zinc-300">
+          <p className="mt-3 text-center text-sm leading-6 text-zinc-200 sm:text-[15px]">
             Enter your registered details to securely verify and download your certificate.
           </p>
           <div className="mt-7">
@@ -153,7 +153,7 @@ export default function Home() {
               href={social.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-zinc-200/90 transition hover:text-zinc-50"
+              className="inline-flex items-center gap-1.5 text-zinc-200/90 transform-gpu transition hover:-translate-y-0.5 hover:text-zinc-50 active:translate-y-0"
             >
               <SocialIcon icon={social.icon} />
               {social.label}

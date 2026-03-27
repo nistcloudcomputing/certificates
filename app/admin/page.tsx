@@ -49,7 +49,7 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
+      <h1 className="text-2xl font-semibold sm:text-3xl">Dashboard</h1>
       {loading ? <p className="text-sm text-zinc-300">Loading dashboard...</p> : null}
       {error ? <p className="text-sm text-red-300">{error}</p> : null}
 
@@ -65,7 +65,7 @@ export default function AdminDashboardPage() {
           <Card>
             <h2 className="text-lg font-semibold">Recent Activity</h2>
             <div className="mt-3 overflow-x-auto">
-              <table className="min-w-full text-left text-sm">
+              <table className="min-w-[680px] text-left text-sm">
                 <thead className="text-zinc-300">
                   <tr>
                     <th className="py-2 pr-4">Email</th>
@@ -78,11 +78,11 @@ export default function AdminDashboardPage() {
                   {data.recentActivity.map((item) => (
                     <tr key={item.id} className="border-t border-white/10">
                       <td className="py-2 pr-4">{item.email}</td>
-                      <td className="py-2 pr-4 text-zinc-400">{item.ip}</td>
+                      <td className="py-2 pr-4 whitespace-nowrap text-zinc-400">{item.ip}</td>
                       <td className={`py-2 pr-4 ${item.status === "success" ? "text-zinc-100" : "text-zinc-400"}`}>
                         {item.status}
                       </td>
-                      <td className="py-2 text-zinc-400">{new Date(item.timestamp).toLocaleString()}</td>
+                      <td className="py-2 whitespace-nowrap text-zinc-400">{new Date(item.timestamp).toLocaleString()}</td>
                     </tr>
                   ))}
                 </tbody>

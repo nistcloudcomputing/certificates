@@ -36,14 +36,14 @@ export default function AdminShell({ children }: AdminShellProps) {
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/75 to-black/90" />
       <div className="absolute inset-x-0 top-0 h-[38vh] bg-gradient-to-b from-black/95 via-black/80 to-transparent" />
       <div className="noise-overlay absolute inset-0 opacity-15" />
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-4 p-4 md:flex-row md:gap-6 md:p-6">
-        <aside className="w-full md:w-64">
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-4 p-3 sm:p-4 md:flex-row md:gap-6 md:p-6">
+        <aside className="w-full md:w-64 md:min-w-64">
           <Card className="h-full">
             <h2 className="mb-1 bg-gradient-to-r from-zinc-50 to-zinc-300 bg-clip-text text-lg font-semibold text-transparent">
               Admin Panel
             </h2>
             <p className="mb-4 text-xs text-zinc-400">Manage users, uploads and analytics</p>
-            <nav className="space-y-2">
+            <nav className="grid grid-cols-2 gap-2 md:block md:space-y-2">
               {links.map((item) => {
                 const Icon = item.icon;
                 const active = pathname === item.href;
@@ -52,7 +52,7 @@ export default function AdminShell({ children }: AdminShellProps) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition ${
+                    className={`flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm transform-gpu transition hover:-translate-y-0.5 active:translate-y-0 md:justify-start ${
                       active
                         ? "bg-zinc-800/85 text-zinc-100 shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
                         : "text-zinc-300 hover:bg-white/10 hover:text-zinc-100"
@@ -66,14 +66,14 @@ export default function AdminShell({ children }: AdminShellProps) {
             </nav>
             <button
               onClick={handleLogout}
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/8 px-3 py-2 text-sm text-zinc-100 transition hover:bg-white/14"
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/8 px-3 py-2 text-sm text-zinc-100 transform-gpu transition hover:-translate-y-0.5 hover:bg-white/14 active:translate-y-0"
             >
               <LogOut className="size-4" />
               Logout
             </button>
           </Card>
         </aside>
-        <section className="min-w-0 flex-1">{children}</section>
+        <section className="min-w-0 flex-1 pb-2">{children}</section>
       </div>
     </div>
   );

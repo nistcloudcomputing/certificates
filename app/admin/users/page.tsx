@@ -89,7 +89,7 @@ export default function AdminUsersPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Users</h1>
+      <h1 className="text-2xl font-semibold sm:text-3xl">Users</h1>
 
       <Card>
         <form className="flex flex-col gap-3 sm:flex-row" onSubmit={handleSearch}>
@@ -102,7 +102,7 @@ export default function AdminUsersPage() {
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
-          <button className="rounded-xl bg-white/10 px-4 py-2 text-sm hover:bg-white/20" type="submit">
+          <button className="w-full rounded-xl bg-white/10 px-4 py-2 text-sm transform-gpu transition hover:-translate-y-0.5 hover:bg-white/20 active:translate-y-0 sm:w-auto" type="submit">
             Search
           </button>
         </form>
@@ -113,7 +113,7 @@ export default function AdminUsersPage() {
         {message ? <p className="mb-3 text-sm text-red-300">{message}</p> : null}
 
         <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-sm">
+          <table className="min-w-[760px] text-left text-sm">
             <thead className="text-zinc-300">
               <tr>
                 <th className="py-2 pr-3">Email</th>
@@ -133,17 +133,17 @@ export default function AdminUsersPage() {
                       {user.certificateStatus}
                     </span>
                   </td>
-                  <td className="py-2 pr-3">{user.downloadCount}</td>
+                  <td className="py-2 pr-3 whitespace-nowrap">{user.downloadCount}</td>
                   <td className="py-2 pr-3">
                     <div className="flex gap-2">
                       <button
-                        className="rounded-lg border border-white/20 px-2 py-1 text-xs hover:bg-white/10"
+                        className="rounded-lg border border-white/20 px-2 py-1 text-xs transform-gpu transition hover:-translate-y-0.5 hover:bg-white/10 active:translate-y-0"
                         onClick={() => setEditUser(user)}
                       >
                         Edit
                       </button>
                       <button
-                        className="rounded-lg border border-red-400/40 px-2 py-1 text-xs text-red-300 hover:bg-red-500/20"
+                        className="rounded-lg border border-red-400/40 px-2 py-1 text-xs text-red-300 transform-gpu transition hover:-translate-y-0.5 hover:bg-red-500/20 active:translate-y-0"
                         onClick={() => void handleDelete(user.id)}
                       >
                         Delete
@@ -181,11 +181,11 @@ export default function AdminUsersPage() {
               className="md:col-span-2"
             />
           </div>
-          <div className="mt-4 flex gap-2">
-            <button className="rounded-xl bg-zinc-800/80 px-4 py-2 text-sm hover:bg-zinc-700/85" onClick={() => void handleSave()}>
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+            <button className="w-full rounded-xl bg-zinc-800/80 px-4 py-2 text-sm transform-gpu transition hover:-translate-y-0.5 hover:bg-zinc-700/85 active:translate-y-0 sm:w-auto" onClick={() => void handleSave()}>
               Save Changes
             </button>
-            <button className="rounded-xl border border-white/20 px-4 py-2 text-sm hover:bg-white/10" onClick={() => setEditUser(null)}>
+            <button className="w-full rounded-xl border border-white/20 px-4 py-2 text-sm transform-gpu transition hover:-translate-y-0.5 hover:bg-white/10 active:translate-y-0 sm:w-auto" onClick={() => setEditUser(null)}>
               Cancel
             </button>
           </div>

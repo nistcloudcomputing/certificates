@@ -362,20 +362,20 @@ export default function AdminUploadPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Upload & Import</h1>
+      <h1 className="text-2xl font-semibold sm:text-3xl">Upload & Import</h1>
 
       <Card>
-        <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="mb-3 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
           <h2 className="flex items-center gap-2 text-lg font-semibold">
             <UploadCloud className="size-4" />
             Upload Certificates
           </h2>
-          <div className="flex items-center gap-2">
+          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
             <button
               type="button"
               disabled={loadingFiles}
               onClick={() => void refreshUploadedFiles()}
-              className="rounded-lg border border-white/20 px-3 py-1.5 text-xs text-zinc-200 transition hover:border-white/35 hover:text-zinc-100 disabled:opacity-60"
+              className="w-full rounded-lg border border-white/20 px-3 py-1.5 text-xs text-zinc-200 transform-gpu transition hover:-translate-y-0.5 hover:border-white/35 hover:text-zinc-100 active:translate-y-0 disabled:opacity-60 sm:w-auto"
             >
               {loadingFiles ? "Refreshing..." : "Refresh List"}
             </button>
@@ -383,7 +383,7 @@ export default function AdminUploadPage() {
               type="button"
               disabled={deletingAllCertificates}
               onClick={() => void handleDeleteAllCertificates()}
-              className="rounded-lg border border-red-400/30 px-3 py-1.5 text-xs text-red-100 transition hover:border-red-300/60 hover:text-red-50 disabled:opacity-60"
+              className="w-full rounded-lg border border-red-400/30 px-3 py-1.5 text-xs text-red-100 transform-gpu transition hover:-translate-y-0.5 hover:border-red-300/60 hover:text-red-50 active:translate-y-0 disabled:opacity-60 sm:w-auto"
             >
               {deletingAllCertificates ? "Deleting..." : "Delete All"}
             </button>
@@ -399,7 +399,7 @@ export default function AdminUploadPage() {
           <button
             type="submit"
             disabled={uploading}
-            className="rounded-xl bg-zinc-800/80 px-4 py-2 text-sm hover:bg-zinc-700/85 disabled:opacity-60"
+            className="w-full rounded-xl bg-zinc-800/80 px-4 py-2 text-sm transform-gpu transition hover:-translate-y-0.5 hover:bg-zinc-700/85 active:translate-y-0 disabled:opacity-60 sm:w-auto"
           >
             {uploading ? "Uploading..." : "Upload Certificates"}
           </button>
@@ -414,15 +414,17 @@ export default function AdminUploadPage() {
             <p className="font-medium text-zinc-200">Uploaded files</p>
             <ul className="space-y-1 text-zinc-300">
               {uploadedFiles.map((item) => (
-                <li key={item.fileKey} className="flex items-center justify-between gap-3">
-                  <span>
-                    {item.fileName} → <span className="text-zinc-200">{item.fileKey}</span>
+                <li key={item.fileKey} className="flex flex-col items-start justify-between gap-2 rounded-lg border border-white/10 p-2 sm:flex-row sm:items-center sm:gap-3 sm:border-0 sm:p-0">
+                  <span className="w-full text-xs sm:text-sm">
+                    <span className="font-medium text-zinc-100">{item.fileName}</span>{" "}
+                    <span className="text-zinc-300">→</span>{" "}
+                    <span className="break-all text-zinc-200">{item.fileKey}</span>
                   </span>
                   <button
                     type="button"
                     disabled={deletingFileKey === item.fileKey}
                     onClick={() => void handleDeleteUploadedFile(item.fileKey)}
-                    className="rounded-md border border-red-400/30 px-2 py-1 text-xs text-red-200 transition hover:border-red-300/60 hover:text-red-100 disabled:opacity-60"
+                    className="w-full rounded-md border border-red-400/30 px-2 py-1 text-xs text-red-200 transform-gpu transition hover:-translate-y-0.5 hover:border-red-300/60 hover:text-red-100 active:translate-y-0 disabled:opacity-60 sm:w-auto"
                   >
                     {deletingFileKey === item.fileKey ? "Deleting..." : "Delete"}
                   </button>
@@ -434,17 +436,17 @@ export default function AdminUploadPage() {
       </Card>
 
       <Card>
-        <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="mb-3 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
           <h2 className="flex items-center gap-2 text-lg font-semibold">
             <FileUp className="size-4" />
             Bulk User Import (CSV)
           </h2>
-          <div className="flex items-center gap-2">
+          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
             <button
               type="button"
               disabled={loadingCsvPreview}
               onClick={() => void refreshCsvPreview()}
-              className="rounded-lg border border-white/20 px-3 py-1.5 text-xs text-zinc-200 transition hover:border-white/35 hover:text-zinc-100 disabled:opacity-60"
+              className="w-full rounded-lg border border-white/20 px-3 py-1.5 text-xs text-zinc-200 transform-gpu transition hover:-translate-y-0.5 hover:border-white/35 hover:text-zinc-100 active:translate-y-0 disabled:opacity-60 sm:w-auto"
             >
               {loadingCsvPreview ? "Refreshing..." : "Refresh List"}
             </button>
@@ -452,7 +454,7 @@ export default function AdminUploadPage() {
               type="button"
               disabled={deletingAllUsers}
               onClick={() => void handleDeleteAllUsers()}
-              className="rounded-lg border border-red-400/30 px-3 py-1.5 text-xs text-red-100 transition hover:border-red-300/60 hover:text-red-50 disabled:opacity-60"
+              className="w-full rounded-lg border border-red-400/30 px-3 py-1.5 text-xs text-red-100 transform-gpu transition hover:-translate-y-0.5 hover:border-red-300/60 hover:text-red-50 active:translate-y-0 disabled:opacity-60 sm:w-auto"
             >
               {deletingAllUsers ? "Deleting..." : "Delete All Users"}
             </button>
@@ -473,7 +475,7 @@ export default function AdminUploadPage() {
           <button
             type="submit"
             disabled={importing}
-            className="rounded-xl bg-zinc-800/80 px-4 py-2 text-sm hover:bg-zinc-700/85 disabled:opacity-60"
+            className="w-full rounded-xl bg-zinc-800/80 px-4 py-2 text-sm transform-gpu transition hover:-translate-y-0.5 hover:bg-zinc-700/85 active:translate-y-0 disabled:opacity-60 sm:w-auto"
           >
             {importing ? "Importing..." : "Import CSV"}
           </button>
@@ -489,7 +491,7 @@ export default function AdminUploadPage() {
 
           {csvPreviewUsers.length ? (
             <div className="overflow-x-auto">
-              <table className="min-w-full text-left text-sm">
+              <table className="min-w-[760px] text-left text-sm">
                 <thead className="text-zinc-300">
                   <tr>
                     <th className="py-2 pr-3">Name</th>
@@ -509,7 +511,7 @@ export default function AdminUploadPage() {
                           type="button"
                           disabled={deletingCsvUserId === user.id}
                           onClick={() => void handleDeleteCsvUser(user.id)}
-                          className="rounded-md border border-red-400/30 px-2 py-1 text-xs text-red-200 transition hover:border-red-300/60 hover:text-red-100 disabled:opacity-60"
+                          className="w-full rounded-md border border-red-400/30 px-2 py-1 text-xs text-red-200 transform-gpu transition hover:-translate-y-0.5 hover:border-red-300/60 hover:text-red-100 active:translate-y-0 disabled:opacity-60 sm:w-auto"
                         >
                           {deletingCsvUserId === user.id ? "Deleting..." : "Delete"}
                         </button>
@@ -538,7 +540,7 @@ export default function AdminUploadPage() {
             <button
               type="submit"
               disabled={deletingCsv}
-              className="rounded-xl border border-red-400/30 px-4 py-2 text-sm text-red-100 transition hover:border-red-300/60 hover:text-red-50 disabled:opacity-60"
+              className="w-full rounded-xl border border-red-400/30 px-4 py-2 text-sm text-red-100 transform-gpu transition hover:-translate-y-0.5 hover:border-red-300/60 hover:text-red-50 active:translate-y-0 disabled:opacity-60 sm:w-auto"
             >
               {deletingCsv ? "Deleting..." : "Delete From CSV"}
             </button>

@@ -20,7 +20,7 @@ function Button({
   return (
     <motion.button
       type="button"
-      whileHover={isDisabled ? undefined : { scale: 1.02, filter: "brightness(1.1)" }}
+      whileHover={isDisabled ? undefined : { y: -2, scale: 1.02, filter: "brightness(1.1)" }}
       whileTap={isDisabled ? undefined : { scale: 0.985 }}
       transition={{ type: "spring", stiffness: 340, damping: 24, mass: 0.7 }}
       disabled={isDisabled}

@@ -44,13 +44,13 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-zinc-950 px-4">
+    <div className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-zinc-950 px-4 py-8 sm:py-10">
       <div className="absolute inset-0 bg-gradient-to-b from-black/74 via-black/78 to-black/92" />
       <div className="absolute inset-x-0 top-0 h-[40vh] bg-gradient-to-b from-black/96 via-black/84 to-transparent" />
       <main className="relative z-10 w-full max-w-md">
         <Card>
-          <h1 className="text-center text-2xl font-semibold text-zinc-100">Admin Login</h1>
-          <p className="mt-2 text-center text-sm text-zinc-300">Sign in to manage certificates.</p>
+          <h1 className="text-center text-[clamp(1.5rem,6vw,2rem)] font-semibold text-zinc-100">Admin Login</h1>
+          <p className="mt-2 text-center text-sm text-zinc-200">Sign in to manage certificates.</p>
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <Input
               id="admin-email"
@@ -76,7 +76,7 @@ export default function AdminLoginPage() {
             <Button type="submit" loading={loading}>
               Login
             </Button>
-            {error ? <p className="text-sm text-red-300">{error}</p> : null}
+            {error ? <p className="rounded-lg border border-red-300/45 bg-red-200/15 px-3 py-2 text-sm text-red-50">{error}</p> : null}
           </form>
         </Card>
       </main>

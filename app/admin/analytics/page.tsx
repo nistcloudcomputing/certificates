@@ -56,7 +56,7 @@ export default function AdminAnalyticsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Analytics</h1>
+      <h1 className="text-2xl font-semibold sm:text-3xl">Analytics</h1>
       {loading ? <p className="text-sm text-zinc-300">Loading analytics...</p> : null}
       {error ? <p className="text-sm text-red-300">{error}</p> : null}
 
@@ -71,7 +71,7 @@ export default function AdminAnalyticsPage() {
 
           <Card>
             <h2 className="mb-3 text-lg font-semibold">Downloads Over Time (Last 14 Days)</h2>
-            <div className="h-72 w-full">
+            <div className="h-64 w-full sm:h-72">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.downloadsOverTime}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" />
@@ -89,7 +89,7 @@ export default function AdminAnalyticsPage() {
           <Card>
             <h2 className="mb-3 text-lg font-semibold">Recent Activity</h2>
             <div className="overflow-x-auto">
-              <table className="min-w-full text-left text-sm">
+              <table className="min-w-[680px] text-left text-sm">
                 <thead className="text-zinc-300">
                   <tr>
                     <th className="py-2 pr-4">Email</th>
@@ -102,11 +102,11 @@ export default function AdminAnalyticsPage() {
                   {data.recentActivity.map((item) => (
                     <tr key={item.id} className="border-t border-white/10">
                       <td className="py-2 pr-4">{item.email}</td>
-                      <td className="py-2 pr-4 text-zinc-400">{item.ip}</td>
+                      <td className="py-2 pr-4 whitespace-nowrap text-zinc-400">{item.ip}</td>
                       <td className={`py-2 pr-4 ${item.status === "success" ? "text-zinc-100" : "text-zinc-400"}`}>
                         {item.status}
                       </td>
-                      <td className="py-2 text-zinc-400">{new Date(item.timestamp).toLocaleString()}</td>
+                      <td className="py-2 whitespace-nowrap text-zinc-400">{new Date(item.timestamp).toLocaleString()}</td>
                     </tr>
                   ))}
                 </tbody>
