@@ -78,6 +78,13 @@ function getBackgroundImageUrls() {
 }
 
 function getConfiguredBackgroundImageUrls() {
+  const splitConfiguredImageUrls = (value: string) =>
+    value
+      .split(/\r?\n|\|/g)
+      .flatMap((entry) => entry.split(/,(?=\s*(?:https?:\/\/|\/))/g))
+      .map((entry) => entry.trim())
+      .filter((entry) => entry.length > 0);
+
   const rawList = process.env.NEXT_PUBLIC_BG_IMAGE_URLS || "";
   const rawSingle = process.env.NEXT_PUBLIC_BG_IMAGE_URL || "";
 
@@ -97,13 +104,10 @@ function getConfiguredBackgroundImageUrls() {
       }
     }
 
-    return listValue
-      .split(/\r?\n|\|/g)
-      .map((entry) => entry.trim())
-      .filter((entry) => entry.length > 0);
+    return splitConfiguredImageUrls(listValue);
   }
 
-  return rawSingle.trim() ? [rawSingle.trim()] : [];
+  return rawSingle.trim() ? splitConfiguredImageUrls(rawSingle.trim()) : [];
 }
 
 export default function Home() {
