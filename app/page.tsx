@@ -93,9 +93,9 @@ export default function Home() {
       ) : (
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: fallbackBackground }} />
       )}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/56 via-black/48 to-black/64" />
-      <div className="absolute inset-x-0 top-0 h-[34vh] bg-gradient-to-b from-black/78 via-black/52 to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,0,0,0.22),transparent_40%),radial-gradient(circle_at_50%_100%,rgba(0,0,0,0.2),transparent_42%)]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/51 via-black/43 to-black/59" />
+      <div className="absolute inset-x-0 top-0 h-[34vh] bg-gradient-to-b from-black/73 via-black/47 to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,0,0,0.17),transparent_40%),radial-gradient(circle_at_50%_100%,rgba(0,0,0,0.15),transparent_42%)]" />
       <div className="noise-overlay absolute inset-0 opacity-20" />
       <div className="absolute inset-0 backdrop-blur-[2px]" />
 
