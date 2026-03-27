@@ -9,8 +9,8 @@ import { getSignedUrl as presignUrl } from "@aws-sdk/s3-request-presigner";
 import { randomUUID } from "node:crypto";
 
 function getS3Config() {
-  const region = process.env.AWS_REGION;
-  const bucketName = process.env.AWS_BUCKET_NAME;
+  const region = process.env.AWS_REGION?.trim();
+  const bucketName = process.env.AWS_BUCKET_NAME?.trim();
 
   if (!region) {
     throw new Error("Missing AWS_REGION environment variable");
@@ -25,17 +25,23 @@ function getS3Config() {
 
 function getDownloadFilename(fileKey: string) {
   const raw = fileKey.split("/").pop() || "certificate";
-  return raw.replace(/^[a-f0-9-]{36}-/, "").replace(/["\\]/g, "_");
+  return raw.replace(/^[a-f0-9-]{36}-/, "").replace(/[^a-zA-Z0-9._-]/g, "_");
 }
 
 export async function getSignedUrl(fileKey: string, options?: { download?: boolean }): Promise<string> {
+  const key = fileKey.trim();
+
+  if (!key) {
+    throw new Error("fileKey is required to sign a URL");
+  }
+
   const { region, bucketName } = getS3Config();
   const s3Client = new S3Client({ region });
-  const filename = getDownloadFilename(fileKey);
+  const filename = getDownloadFilename(key);
 
   const command = new GetObjectCommand({
     Bucket: bucketName,
-    Key: fileKey,
+    Key: key,
     ...(options?.download
       ? {
           ResponseContentDisposition: `attachment; filename="${filename}"`,
