@@ -77,14 +77,42 @@ function getBackgroundImageUrls() {
   }
 }
 
+function getConfiguredBackgroundImageUrls() {
+  const rawList = process.env.NEXT_PUBLIC_BG_IMAGE_URLS || "";
+  const rawSingle = process.env.NEXT_PUBLIC_BG_IMAGE_URL || "";
+
+  if (rawList.trim()) {
+    const listValue = rawList.trim();
+
+    if (listValue.startsWith("[")) {
+      try {
+        const parsed = JSON.parse(listValue);
+        if (Array.isArray(parsed)) {
+          return parsed
+            .map((entry) => (typeof entry === "string" ? entry.trim() : ""))
+            .filter((entry) => entry.length > 0);
+        }
+      } catch {
+        // Fall through to delimiter parsing.
+      }
+    }
+
+    return listValue
+      .split(/\r?\n|\|/g)
+      .map((entry) => entry.trim())
+      .filter((entry) => entry.length > 0);
+  }
+
+  return rawSingle.trim() ? [rawSingle.trim()] : [];
+}
+
 export default function Home() {
-  const bgImage = process.env.NEXT_PUBLIC_BG_IMAGE_URL;
   const clubLogoUrl = process.env.NEXT_PUBLIC_CLUB_LOGO_URL;
   const eventName = process.env.NEXT_PUBLIC_EVENT_NAME || "cloud vision, by cloud computing club";
-  const backgroundImages = getBackgroundImageUrls();
-  const fallbackBackground = bgImage
-    ? `url(${bgImage})`
-    : "linear-gradient(180deg, #060606 0%, #030303 48%, #000000 100%)";
+  const configuredBackgroundImages = getConfiguredBackgroundImageUrls();
+  const localBackgroundImages = getBackgroundImageUrls();
+  const backgroundImages = configuredBackgroundImages.length ? configuredBackgroundImages : localBackgroundImages;
+  const fallbackBackground = "linear-gradient(180deg, #060606 0%, #030303 48%, #000000 100%)";
 
   return (
     <div className="relative isolate flex min-h-screen items-center justify-center overflow-hidden px-4 py-20 sm:px-6 sm:py-12">
