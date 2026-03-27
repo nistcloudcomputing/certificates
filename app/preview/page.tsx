@@ -74,8 +74,7 @@ export default function PreviewPage() {
   useEffect(() => {
     async function loadPreview() {
       if (!token) {
-        setError("Invalid preview request.");
-        setLoading(false);
+        window.location.replace("/");
         return;
       }
 

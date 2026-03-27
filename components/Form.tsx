@@ -4,12 +4,12 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import { CheckCircle2, Mail, UserRound } from "lucide-react";
-import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { FormEvent, useCallback, useState } from "react";
 
 type ApiResponse = {
   success: boolean;
   message: string;
-  previewToken?: string;
+  downloadUrl?: string;
 };
 
 export default function Form() {
@@ -18,15 +18,6 @@ export default function Form() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const formControls = useAnimationControls();
-  const downloadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (downloadTimeoutRef.current) {
-        clearTimeout(downloadTimeoutRef.current);
-      }
-    };
-  }, []);
 
   const triggerErrorAnimation = useCallback(async () => {
     await formControls.start({
@@ -63,7 +54,7 @@ export default function Form() {
 
       const data = (await response.json()) as ApiResponse;
 
-      if (!response.ok || !data.success || !data.previewToken) {
+      if (!response.ok || !data.success || !data.downloadUrl) {
         setMessage({
           type: "error",
           text: data.message || "Invalid details. Please check and try again.",
@@ -74,12 +65,15 @@ export default function Form() {
 
       setMessage({
         type: "success",
-        text: "Verified successfully. Redirecting to preview...",
+        text: "Verified successfully. Starting download...",
       });
 
-      downloadTimeoutRef.current = setTimeout(() => {
-        window.location.assign(`/preview?token=${encodeURIComponent(data.previewToken as string)}`);
-      }, 500);
+      const link = document.createElement("a");
+      link.href = data.downloadUrl;
+      link.rel = "noopener noreferrer";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
     } catch {
       setMessage({
         type: "error",

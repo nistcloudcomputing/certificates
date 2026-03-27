@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { signPreviewToken } from "@/lib/auth";
 import { ensureDbSchema, getDbClient } from "@/lib/db";
 import { getClientIp, normalizeInput } from "@/lib/request";
+import { getSignedUrl } from "@/lib/s3";
 
 const GENERIC_ERROR_MESSAGE = "Invalid credentials. Please check your details and try again.";
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -146,16 +146,12 @@ export async function POST(request: NextRequest) {
       VALUES (${user.email}, ${clientIp}, 'success', NOW())
     `;
 
-    const previewToken = await signPreviewToken({
-      email: user.email,
-      name: user.name,
-      fileKey: user.file_key,
-    });
+    const downloadUrl = await getSignedUrl(user.file_key, { download: true });
 
     return NextResponse.json({
       success: true,
-      message: "Verification successful. Redirecting to preview.",
-      previewToken,
+      message: "Verification successful. Download will start shortly.",
+      downloadUrl,
     });
   } catch (error) {
     console.error("Verification failed:", error);
