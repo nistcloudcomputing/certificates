@@ -1,0 +1,12 @@
+[
+  {
+    "email": "abc@gmail.com",
+    "name": "Satyam Singh",
+    "fileKey": "certificates/uuid-1234.pdf"
+  },
+  {
+    "email": "jane.doe@example.com",
+    "name": "Jane Doe",
+    "fileKey": "certificates/uuid-5678.pdf"
+  }
+]
