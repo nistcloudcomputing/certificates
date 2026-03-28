@@ -30,6 +30,8 @@ export default function AdminUploadPage() {
   const [csvPreviewMessage, setCsvPreviewMessage] = useState("");
   const [deletingCsvUserId, setDeletingCsvUserId] = useState<string | null>(null);
   const [deletingAllUsers, setDeletingAllUsers] = useState(false);
+  const [savingManualEntry, setSavingManualEntry] = useState(false);
+  const [manualEntryMessage, setManualEntryMessage] = useState("");
 
   const refreshUploadedFiles = useCallback(async () => {
     setLoadingFiles(true);
@@ -177,6 +179,121 @@ export default function AdminUploadPage() {
       setImportMessage("CSV import failed.");
     } finally {
       setImporting(false);
+    }
+  };
+
+  const handleManualEntry = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setManualEntryMessage("");
+
+    const formElement = event.currentTarget;
+    const nameInput = formElement.elements.namedItem("manual-name") as HTMLInputElement;
+    const emailInput = formElement.elements.namedItem("manual-email") as HTMLInputElement;
+    const keyIdInput = formElement.elements.namedItem("manual-keyid") as HTMLInputElement;
+    const fileInput = formElement.elements.namedItem("manual-file") as HTMLInputElement;
+
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const keyId = keyIdInput.value.trim();
+    const selectedFile = fileInput.files?.[0] || null;
+
+    if (!name) {
+      setManualEntryMessage("Name is required.");
+      return;
+    }
+
+    if (!email) {
+      setManualEntryMessage("Email is required.");
+      return;
+    }
+
+    if (!keyId && !selectedFile) {
+      setManualEntryMessage("Provide keyId or upload a single certificate file.");
+      return;
+    }
+
+    setSavingManualEntry(true);
+    let uploadedFileKey = "";
+    const cleanupUploadedFile = async (fileKey: string) => {
+      try {
+        await fetch("/api/admin/upload", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fileKey }),
+        });
+      } catch {
+        // Ignore cleanup failures so we can return the original error message.
+      }
+    };
+
+    try {
+      if (selectedFile) {
+        const uploadFormData = new FormData();
+        uploadFormData.append("files", selectedFile);
+
+        const uploadResponse = await fetch("/api/admin/upload", {
+          method: "POST",
+          body: uploadFormData,
+        });
+
+        const uploadData = (await uploadResponse.json()) as {
+          success: boolean;
+          message?: string;
+          uploaded?: UploadResult[];
+        };
+
+        if (!uploadResponse.ok || !uploadData.success) {
+          setManualEntryMessage(uploadData.message || "Certificate upload failed.");
+          return;
+        }
+
+        uploadedFileKey = uploadData.uploaded?.[0]?.fileKey || "";
+        if (!uploadedFileKey) {
+          setManualEntryMessage("Certificate upload succeeded but no fileKey was returned.");
+          return;
+        }
+      }
+
+      const fileKeyToSave = uploadedFileKey || keyId;
+      const response = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          fileKey: fileKeyToSave,
+          keyId: fileKeyToSave,
+        }),
+      });
+
+      const data = (await response.json()) as {
+        success: boolean;
+        message?: string;
+      };
+
+      if (!response.ok || !data.success) {
+        if (uploadedFileKey) {
+          await cleanupUploadedFile(uploadedFileKey);
+        }
+
+        setManualEntryMessage(data.message || "Manual save failed.");
+        return;
+      }
+
+      setManualEntryMessage(
+        `Saved ${name} (${email}) with keyId: ${fileKeyToSave}`,
+      );
+      formElement.reset();
+      await refreshCsvPreview();
+      await refreshUploadedFiles();
+    } catch {
+      if (uploadedFileKey) {
+        await cleanupUploadedFile(uploadedFileKey);
+      }
+
+      setManualEntryMessage("Manual save failed.");
+    } finally {
+      setSavingManualEntry(false);
     }
   };
 
@@ -405,6 +522,51 @@ export default function AdminUploadPage() {
           </button>
           {uploadMessage ? <p className="text-sm text-zinc-200">{uploadMessage}</p> : null}
         </form>
+
+        <div className="mt-5 border-t border-white/10 pt-4">
+          <h3 className="mb-2 text-sm font-semibold text-zinc-200">Manual Single Certificate Entry</h3>
+          <p className="mb-3 text-xs text-zinc-400">
+            Add one user with `name`, `email`, and `keyId` manually. You can enter `keyId` directly or upload one file.
+          </p>
+          <form className="space-y-3" onSubmit={handleManualEntry}>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <input
+                name="manual-name"
+                type="text"
+                placeholder="Name"
+                className="block w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm"
+              />
+              <input
+                name="manual-email"
+                type="email"
+                placeholder="Email"
+                className="block w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm"
+              />
+            </div>
+            <input
+              name="manual-keyid"
+              type="text"
+              placeholder="keyId (example: certificates/abc.pdf)"
+              className="block w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm"
+            />
+            <input
+              name="manual-file"
+              type="file"
+              className="block w-full rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm"
+            />
+            <p className="text-xs text-zinc-400">
+              If a file is selected, its generated S3 fileKey is used as `keyId`.
+            </p>
+            <button
+              type="submit"
+              disabled={savingManualEntry}
+              className="w-full rounded-xl bg-zinc-800/80 px-4 py-2 text-sm transform-gpu transition hover:-translate-y-0.5 hover:bg-zinc-700/85 active:translate-y-0 disabled:opacity-60 sm:w-auto"
+            >
+              {savingManualEntry ? "Saving..." : "Save Single Entry"}
+            </button>
+            {manualEntryMessage ? <p className="text-sm text-zinc-200">{manualEntryMessage}</p> : null}
+          </form>
+        </div>
 
         {loadingFiles ? <p className="mt-4 text-sm text-zinc-300">Loading uploaded files...</p> : null}
         {!loadingFiles && !uploadedFiles.length ? <p className="mt-4 text-sm text-zinc-300">No uploaded files found.</p> : null}

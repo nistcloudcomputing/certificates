@@ -6,6 +6,10 @@ function normalize(value: string) {
   return value.trim().toLowerCase();
 }
 
+function isLikelyEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
 export async function GET(request: NextRequest) {
   const admin = await requireAdminFromRequest(request);
   if (!admin) {
@@ -60,6 +64,79 @@ export async function GET(request: NextRequest) {
       certificateStatus: user.file_key ? "assigned" : "unassigned",
       updatedAt: user.updated_at,
     })),
+  });
+}
+
+export async function POST(request: NextRequest) {
+  const admin = await requireAdminFromRequest(request);
+  if (!admin) {
+    return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+  }
+
+  await ensureDbSchema();
+  const sql = getDbClient();
+
+  const body = (await request.json()) as {
+    email?: string;
+    name?: string;
+    fileKey?: string;
+    keyId?: string;
+  };
+
+  const email = normalize(body.email || "");
+  const name = (body.name || "").trim();
+  const fileKey = (body.fileKey || body.keyId || "").trim();
+
+  if (!email || !isLikelyEmail(email)) {
+    return NextResponse.json(
+      { success: false, message: "A valid email is required." },
+      { status: 400 },
+    );
+  }
+
+  if (!name) {
+    return NextResponse.json({ success: false, message: "Name is required." }, { status: 400 });
+  }
+
+  if (!fileKey) {
+    return NextResponse.json(
+      { success: false, message: "Certificate keyId (fileKey) is required." },
+      { status: 400 },
+    );
+  }
+
+  const rows = await sql<
+    {
+      id: number;
+      email: string;
+      name: string;
+      file_key: string;
+      download_count: number;
+    }[]
+  >`
+    INSERT INTO users (email, name, file_key, download_count, created_at, updated_at)
+    VALUES (${email}, ${name}, ${fileKey}, 0, NOW(), NOW())
+    ON CONFLICT (email)
+    DO UPDATE SET
+      name = EXCLUDED.name,
+      file_key = EXCLUDED.file_key,
+      updated_at = NOW()
+    RETURNING id, email, name, file_key, download_count
+  `;
+
+  const user = rows[0];
+
+  return NextResponse.json({
+    success: true,
+    message: "User saved.",
+    user: {
+      id: String(user.id),
+      email: user.email,
+      name: user.name,
+      fileKey: user.file_key,
+      downloadCount: user.download_count,
+      certificateStatus: user.file_key ? "assigned" : "unassigned",
+    },
   });
 }
 
