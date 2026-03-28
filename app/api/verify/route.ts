@@ -6,9 +6,11 @@ import { getSignedUrl } from "@/lib/s3";
 const GENERIC_ERROR_MESSAGE = "Invalid credentials. Please check your details and try again.";
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 10;
+const MAX_DOWNLOADS_PER_USER = 2;
+const DOWNLOAD_LIMIT_MESSAGE = `Download limit reached. You can only download your certificate ${MAX_DOWNLOADS_PER_USER} times.`;
 
 const requestLog = new Map<string, number[]>();
-type UserRecord = { id: number; email: string; name: string; file_key: string };
+type UserRecord = { id: number; email: string; name: string; file_key: string; download_count: number };
 
 function isRateLimited(clientIp: string): boolean {
   const now = Date.now();
@@ -65,7 +67,7 @@ export async function POST(request: NextRequest) {
     await ensureDbSchema();
     const matchedByEmail = normalizedEmail
       ? await sql<UserRecord[]>`
-          SELECT id, email, name, file_key
+          SELECT id, email, name, file_key, download_count
           FROM users
           WHERE LOWER(email) = ${normalizedEmail}
           LIMIT 2
@@ -73,7 +75,7 @@ export async function POST(request: NextRequest) {
       : [];
     const matchedByName = normalizedName
       ? await sql<UserRecord[]>`
-          SELECT id, email, name, file_key
+          SELECT id, email, name, file_key, download_count
           FROM users
           WHERE LOWER(name) = ${normalizedName}
           LIMIT 2
@@ -83,7 +85,7 @@ export async function POST(request: NextRequest) {
     const matchedByBoth =
       normalizedEmail && normalizedName
         ? await sql<UserRecord[]>`
-            SELECT id, email, name, file_key
+            SELECT id, email, name, file_key, download_count
             FROM users
             WHERE LOWER(email) = ${normalizedEmail}
               AND LOWER(name) = ${normalizedName}
@@ -134,12 +136,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await sql`
+    const incremented = await sql<{ download_count: number }[]>`
       UPDATE users
       SET download_count = download_count + 1,
           updated_at = NOW()
       WHERE id = ${user.id}
+        AND download_count < ${MAX_DOWNLOADS_PER_USER}
+      RETURNING download_count
     `;
+
+    if (!incremented[0]) {
+      await sql`
+        INSERT INTO logs (email, ip, status, timestamp)
+        VALUES (${user.email}, ${clientIp}, 'failure', NOW())
+      `;
+
+      return NextResponse.json(
+        {
+          success: false,
+          message: DOWNLOAD_LIMIT_MESSAGE,
+        },
+        { status: 403 },
+      );
+    }
 
     await sql`
       INSERT INTO logs (email, ip, status, timestamp)
