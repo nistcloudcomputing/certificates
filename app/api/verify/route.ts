@@ -6,11 +6,17 @@ import { getSignedUrl } from "@/lib/s3";
 const GENERIC_ERROR_MESSAGE = "Invalid credentials. Please check your details and try again.";
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 10;
-const MAX_DOWNLOADS_PER_USER = 2;
-const DOWNLOAD_LIMIT_MESSAGE = `Download limit reached. You can only download your certificate ${MAX_DOWNLOADS_PER_USER} times.`;
+const DEFAULT_DOWNLOAD_LIMIT = 2;
 
 const requestLog = new Map<string, number[]>();
-type UserRecord = { id: number; email: string; name: string; file_key: string; download_count: number };
+type UserRecord = {
+  id: number;
+  email: string;
+  name: string;
+  file_key: string;
+  download_count: number;
+  download_limit: number;
+};
 
 function isRateLimited(clientIp: string): boolean {
   const now = Date.now();
@@ -67,7 +73,7 @@ export async function POST(request: NextRequest) {
     await ensureDbSchema();
     const matchedByEmail = normalizedEmail
       ? await sql<UserRecord[]>`
-          SELECT id, email, name, file_key, download_count
+          SELECT id, email, name, file_key, download_count, download_limit
           FROM users
           WHERE LOWER(email) = ${normalizedEmail}
           LIMIT 2
@@ -75,7 +81,7 @@ export async function POST(request: NextRequest) {
       : [];
     const matchedByName = normalizedName
       ? await sql<UserRecord[]>`
-          SELECT id, email, name, file_key, download_count
+          SELECT id, email, name, file_key, download_count, download_limit
           FROM users
           WHERE LOWER(name) = ${normalizedName}
           LIMIT 2
@@ -85,7 +91,7 @@ export async function POST(request: NextRequest) {
     const matchedByBoth =
       normalizedEmail && normalizedName
         ? await sql<UserRecord[]>`
-            SELECT id, email, name, file_key, download_count
+            SELECT id, email, name, file_key, download_count, download_limit
             FROM users
             WHERE LOWER(email) = ${normalizedEmail}
               AND LOWER(name) = ${normalizedName}
@@ -141,7 +147,7 @@ export async function POST(request: NextRequest) {
       SET download_count = download_count + 1,
           updated_at = NOW()
       WHERE id = ${user.id}
-        AND download_count < ${MAX_DOWNLOADS_PER_USER}
+        AND download_count < download_limit
       RETURNING download_count
     `;
 
@@ -154,7 +160,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: DOWNLOAD_LIMIT_MESSAGE,
+          message: `Download limit reached. You can only download your certificate ${user.download_limit ?? DEFAULT_DOWNLOAD_LIMIT} times.`,
         },
         { status: 403 },
       );

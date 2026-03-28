@@ -11,6 +11,7 @@ type UserItem = {
   name: string;
   fileKey: string;
   downloadCount: number;
+  downloadLimit: number;
   certificateStatus: "assigned" | "unassigned";
 };
 
@@ -19,6 +20,7 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<UserItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [grantingUserId, setGrantingUserId] = useState<string | null>(null);
 
   const [editUser, setEditUser] = useState<UserItem | null>(null);
 
@@ -87,6 +89,33 @@ export default function AdminUsersPage() {
     setEditUser(null);
   };
 
+  const handleAddMoreDownloads = async (id: string) => {
+    setGrantingUserId(id);
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, downloadLimitDelta: 1 }),
+      });
+
+      const data = (await response.json()) as { success: boolean; user?: UserItem; message?: string };
+
+      if (!response.ok || !data.success || !data.user) {
+        setMessage(data.message || "Could not add more downloads.");
+        return;
+      }
+
+      setUsers((prev) => prev.map((item) => (item.id === data.user?.id ? data.user : item)));
+      setEditUser((prev) => (prev && prev.id === data.user?.id ? data.user : prev));
+    } catch {
+      setMessage("Could not add more downloads.");
+    } finally {
+      setGrantingUserId(null);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-semibold sm:text-3xl">Users</h1>
@@ -119,7 +148,7 @@ export default function AdminUsersPage() {
                 <th className="py-2 pr-3">Email</th>
                 <th className="py-2 pr-3">Name</th>
                 <th className="py-2 pr-3">Certificate</th>
-                <th className="py-2 pr-3">Downloads</th>
+                <th className="py-2 pr-3">Downloads (Used/Limit)</th>
                 <th className="py-2 pr-3">Actions</th>
               </tr>
             </thead>
@@ -133,7 +162,7 @@ export default function AdminUsersPage() {
                       {user.certificateStatus}
                     </span>
                   </td>
-                  <td className="py-2 pr-3 whitespace-nowrap">{user.downloadCount}</td>
+                  <td className="py-2 pr-3 whitespace-nowrap">{user.downloadCount} / {user.downloadLimit}</td>
                   <td className="py-2 pr-3">
                     <div className="flex gap-2">
                       <button
@@ -141,6 +170,13 @@ export default function AdminUsersPage() {
                         onClick={() => setEditUser(user)}
                       >
                         Edit
+                      </button>
+                      <button
+                        className="rounded-lg border border-emerald-400/40 px-2 py-1 text-xs text-emerald-200 transform-gpu transition hover:-translate-y-0.5 hover:bg-emerald-500/20 active:translate-y-0 disabled:opacity-60"
+                        disabled={grantingUserId === user.id}
+                        onClick={() => void handleAddMoreDownloads(user.id)}
+                      >
+                        {grantingUserId === user.id ? "Adding..." : "+1 Download"}
                       </button>
                       <button
                         className="rounded-lg border border-red-400/40 px-2 py-1 text-xs text-red-300 transform-gpu transition hover:-translate-y-0.5 hover:bg-red-500/20 active:translate-y-0"
@@ -179,6 +215,24 @@ export default function AdminUsersPage() {
               value={editUser.fileKey}
               onChange={(event) => setEditUser((prev) => (prev ? { ...prev, fileKey: event.target.value } : prev))}
               className="md:col-span-2"
+            />
+            <Input
+              id="edit-download-limit"
+              label="Download limit"
+              type="number"
+              min={0}
+              step={1}
+              value={String(editUser.downloadLimit)}
+              onChange={(event) =>
+                setEditUser((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        downloadLimit: Math.max(0, Math.trunc(Number(event.target.value) || 0)),
+                      }
+                    : prev,
+                )
+              }
             />
           </div>
           <div className="mt-4 flex flex-col gap-2 sm:flex-row">

@@ -10,6 +10,11 @@ function isLikelyEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+function parseInteger(value: unknown) {
+  if (typeof value !== "number" || !Number.isFinite(value)) return null;
+  return Math.trunc(value);
+}
+
 export async function GET(request: NextRequest) {
   const admin = await requireAdminFromRequest(request);
   if (!admin) {
@@ -28,10 +33,11 @@ export async function GET(request: NextRequest) {
           name: string;
           file_key: string;
           download_count: number;
+          download_limit: number;
           updated_at: string;
         }[]
       >`
-        SELECT id, email, name, file_key, download_count, updated_at
+        SELECT id, email, name, file_key, download_count, download_limit, updated_at
         FROM users
         WHERE email ILIKE ${`%${search}%`}
         ORDER BY created_at DESC
@@ -44,10 +50,11 @@ export async function GET(request: NextRequest) {
           name: string;
           file_key: string;
           download_count: number;
+          download_limit: number;
           updated_at: string;
         }[]
       >`
-        SELECT id, email, name, file_key, download_count, updated_at
+        SELECT id, email, name, file_key, download_count, download_limit, updated_at
         FROM users
         ORDER BY created_at DESC
         LIMIT 300
@@ -61,6 +68,7 @@ export async function GET(request: NextRequest) {
       name: user.name,
       fileKey: user.file_key,
       downloadCount: user.download_count,
+      downloadLimit: user.download_limit,
       certificateStatus: user.file_key ? "assigned" : "unassigned",
       updatedAt: user.updated_at,
     })),
@@ -112,6 +120,7 @@ export async function POST(request: NextRequest) {
       name: string;
       file_key: string;
       download_count: number;
+      download_limit: number;
     }[]
   >`
     INSERT INTO users (email, name, file_key, download_count, created_at, updated_at)
@@ -121,7 +130,7 @@ export async function POST(request: NextRequest) {
       name = EXCLUDED.name,
       file_key = EXCLUDED.file_key,
       updated_at = NOW()
-    RETURNING id, email, name, file_key, download_count
+    RETURNING id, email, name, file_key, download_count, download_limit
   `;
 
   const user = rows[0];
@@ -135,6 +144,7 @@ export async function POST(request: NextRequest) {
       name: user.name,
       fileKey: user.file_key,
       downloadCount: user.download_count,
+      downloadLimit: user.download_limit,
       certificateStatus: user.file_key ? "assigned" : "unassigned",
     },
   });
@@ -154,6 +164,8 @@ export async function PATCH(request: NextRequest) {
     email?: string;
     name?: string;
     fileKey?: string;
+    downloadLimit?: number;
+    downloadLimitDelta?: number;
   };
 
   if (!body.id) {
@@ -163,8 +175,17 @@ export async function PATCH(request: NextRequest) {
   const nextEmail = typeof body.email === "string" ? normalize(body.email) : null;
   const nextName = typeof body.name === "string" ? body.name.trim() : null;
   const nextFileKey = typeof body.fileKey === "string" ? body.fileKey.trim() : null;
+  const requestedDownloadLimit = parseInteger(body.downloadLimit);
+  const downloadLimitDelta = parseInteger(body.downloadLimitDelta);
+  const nextDownloadLimit = requestedDownloadLimit === null ? null : Math.max(0, requestedDownloadLimit);
 
-  if (nextEmail === null && nextName === null && nextFileKey === null) {
+  if (
+    nextEmail === null
+    && nextName === null
+    && nextFileKey === null
+    && nextDownloadLimit === null
+    && downloadLimitDelta === null
+  ) {
     return NextResponse.json({ success: false, message: "No updates provided." }, { status: 400 });
   }
 
@@ -176,6 +197,7 @@ export async function PATCH(request: NextRequest) {
         name: string;
         file_key: string;
         download_count: number;
+        download_limit: number;
       }[]
     >`
       UPDATE users
@@ -183,9 +205,14 @@ export async function PATCH(request: NextRequest) {
         email = COALESCE(${nextEmail}, email),
         name = COALESCE(${nextName}, name),
         file_key = COALESCE(${nextFileKey}, file_key),
+        download_limit = GREATEST(
+          download_count,
+          COALESCE(${nextDownloadLimit}, download_limit) + COALESCE(${downloadLimitDelta}, 0),
+          0
+        ),
         updated_at = NOW()
       WHERE id = ${Number(body.id)}
-      RETURNING id, email, name, file_key, download_count
+      RETURNING id, email, name, file_key, download_count, download_limit
     `;
 
     if (!updated[0]) {
@@ -202,6 +229,7 @@ export async function PATCH(request: NextRequest) {
         name: row.name,
         fileKey: row.file_key,
         downloadCount: row.download_count,
+        downloadLimit: row.download_limit,
         certificateStatus: row.file_key ? "assigned" : "unassigned",
       },
     });

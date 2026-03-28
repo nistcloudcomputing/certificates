@@ -38,9 +38,15 @@ export async function ensureDbSchema() {
           name TEXT NOT NULL,
           file_key TEXT NOT NULL DEFAULT '',
           download_count INTEGER NOT NULL DEFAULT 0,
+          download_limit INTEGER NOT NULL DEFAULT 2,
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
           updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
+      `;
+
+      await sql`
+        ALTER TABLE users
+        ADD COLUMN IF NOT EXISTS download_limit INTEGER NOT NULL DEFAULT 2
       `;
 
       await sql`
