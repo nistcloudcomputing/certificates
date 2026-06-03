@@ -2,25 +2,6 @@
 
 import { motion } from "framer-motion";
 
-const floatingAnimation = {
-  y: [0, -10, 0],
-  transition: {
-    duration: 4,
-    repeat: Infinity,
-    ease: "easeInOut",
-  },
-};
-
-const pulseGlow = {
-  opacity: [0.3, 0.6, 0.3],
-  scale: [1, 1.08, 1],
-  transition: {
-    duration: 3,
-    repeat: Infinity,
-    ease: "easeInOut",
-  },
-};
-
 const gearRotate = {
   rotate: 360,
   transition: {
@@ -28,7 +9,7 @@ const gearRotate = {
     repeat: Infinity,
     ease: "linear",
   },
-};
+} as const;
 
 const gearRotateReverse = {
   rotate: -360,
@@ -37,7 +18,7 @@ const gearRotateReverse = {
     repeat: Infinity,
     ease: "linear",
   },
-};
+} as const;
 
 export default function MaintenancePage({ clubLogoUrl }: { clubLogoUrl?: string }) {
   return (
