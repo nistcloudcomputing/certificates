@@ -70,18 +70,23 @@ export default function MaintenancePage({ clubLogoUrl }: { clubLogoUrl?: string 
       >
         {/* Club logo */}
         {clubLogoUrl && (
-          <div className="relative mb-10 flex flex-col items-center gap-4">
-            <div className="relative" style={{ width: 72, height: 72 }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={clubLogoUrl}
-                alt="Cloud Computing Club logo"
-                className="h-full w-full object-contain"
-              />
+          <div className="mb-10 flex items-center gap-3 rounded-2xl border border-zinc-200 bg-white px-5 py-3 shadow-sm">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={clubLogoUrl}
+              alt="Cloud Computing Club logo"
+              width={40}
+              height={40}
+              style={{ width: 40, height: 40, objectFit: "contain", display: "block" }}
+            />
+            <div className="flex flex-col leading-tight">
+              <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-400">
+                Presented by
+              </span>
+              <span className="text-base font-bold tracking-tight text-zinc-800">
+                Cloud Computing Club
+              </span>
             </div>
-            <p className="text-base font-semibold tracking-wide text-zinc-700 sm:text-lg">
-              Cloud Computing Club
-            </p>
           </div>
         )}
 
@@ -159,7 +164,7 @@ export default function MaintenancePage({ clubLogoUrl }: { clubLogoUrl?: string 
           animate={{ opacity: 1 }}
           transition={{ delay: 0.9, duration: 0.6 }}
         >
-          Cloud Computing Club
+          NIST · Berhampur
         </motion.p>
       </motion.div>
     </div>
