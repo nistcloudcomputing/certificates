@@ -4,6 +4,7 @@ import BackgroundSlideshow from "@/components/BackgroundSlideshow";
 import Card from "@/components/ui/Card";
 import Form from "@/components/Form";
 import Image from "next/image";
+import MaintenancePage from "@/components/MaintenancePage";
 
 const BACKGROUND_IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
 type SocialIcon = "instagram" | "linkedin" | "facebook" | "youtube";
@@ -112,6 +113,12 @@ function getConfiguredBackgroundImageUrls() {
 
 export default function Home() {
   const clubLogoUrl = process.env.NEXT_PUBLIC_CLUB_LOGO_URL;
+  const maintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === "true";
+
+  if (maintenanceMode) {
+    return <MaintenancePage clubLogoUrl={clubLogoUrl} />;
+  }
+
   const eventName = process.env.NEXT_PUBLIC_EVENT_NAME || "cloud vision, by cloud computing club";
   const configuredBackgroundImages = getConfiguredBackgroundImageUrls();
   const localBackgroundImages = getBackgroundImageUrls();

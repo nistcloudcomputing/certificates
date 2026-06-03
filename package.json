@@ -31,5 +31,20 @@
     "eslint-config-next": "16.2.1",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "description": "A production-style certificate verification and delivery platform built with Next.js, PostgreSQL, and AWS S3.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nistcloudcomputing/certificates.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nistcloudcomputing/certificates/issues"
+  },
+  "homepage": "https://github.com/nistcloudcomputing/certificates#readme"
 }
